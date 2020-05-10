@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -9,12 +10,33 @@ namespace CIS580_Final
     /// </summary>
     public class Game1 : Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        GraphicsDeviceManager _graphics;
+        SpriteBatch _spriteBatch;
+
+        // Math constants for buildings
+        private const double BtcPerClick = 0.00011d;
+        private const double BtcPerCpu = 0.000011d;
+        private const double BtcPerGpu = 0.00011d;
+        private const double BtcPerServer = 0.00088d;
+        private const double BtcPerMiner = 0.00517d;
+        private const double BtcPerSupercomputer = 0.0286;
+
+        /// <summary>
+        /// A list of all items the user has built
+        /// </summary>
+        private List<Building> buildings = new List<Building>();
+
+        /// <summary>
+        /// The number of Bitcoin the user has collected
+        /// </summary>
+        private double Bitcoin { get; set; }
         
+        /// <summary>
+        /// Constructs a new instance of the game
+        /// </summary>
         public Game1()
         {
-            graphics = new GraphicsDeviceManager(this);
+            _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
 
@@ -38,7 +60,7 @@ namespace CIS580_Final
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
         }
@@ -63,6 +85,31 @@ namespace CIS580_Final
                 Exit();
 
             // TODO: Add your update logic here
+            double bps = 0.0d;
+
+            buildings.ForEach(building =>
+            {
+                switch (building.Type)
+                {
+                    case BuildingType.Cpu:
+                        bps += BtcPerCpu;
+                        break;
+                    case BuildingType.Gpu:
+                        bps += BtcPerGpu;
+                        break;
+                    case BuildingType.Server:
+                        bps += BtcPerServer;
+                        break;
+                    case BuildingType.Miner:
+                        bps += BtcPerMiner;
+                        break;
+                    case BuildingType.Supercomputer:
+                        bps += BtcPerSupercomputer;
+                        break;
+                }
+            });
+
+            Bitcoin += bps * gameTime.ElapsedGameTime.Seconds;
 
             base.Update(gameTime);
         }
