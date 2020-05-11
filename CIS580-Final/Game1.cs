@@ -126,7 +126,6 @@ namespace CIS580_Final
 
             Bitcoin += bps * gameTime.ElapsedGameTime.Seconds;
 
-
             //Mouse Controls
 
             MouseState mouseState = Mouse.GetState();
