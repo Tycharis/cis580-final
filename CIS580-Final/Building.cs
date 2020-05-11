@@ -8,6 +8,9 @@ namespace CIS580_Final
 {
     internal struct Building
     {
-        internal BuildingType Type { get; }
+        internal BuildingType Type { get; set; }
+
     }
+
+
 }
