@@ -13,6 +13,11 @@ namespace CIS580_Final
         GraphicsDeviceManager _graphics;
         SpriteBatch _spriteBatch;
 
+        Vector2 mousePosition;
+        Texture2D background;
+        Texture2D test;
+        
+
         // Math constants for buildings
         private const double BtcPerClick = 0.00011d;
         private const double BtcPerCpu = 0.000011d;
@@ -51,6 +56,16 @@ namespace CIS580_Final
             // TODO: Add your initialization logic here
 
             base.Initialize();
+            IsMouseVisible = true;
+
+            _graphics.PreferredBackBufferHeight = 768;
+            _graphics.PreferredBackBufferWidth = 1024;
+            _graphics.ApplyChanges();
+
+            mousePosition = new Vector2(_graphics.GraphicsDevice.Viewport.Width / 2, _graphics.GraphicsDevice.Viewport.Height / 2);
+            background = this.Content.Load<Texture2D>("GameBG");
+            test = this.Content.Load<Texture2D>("pixel");
+
         }
 
         /// <summary>
@@ -111,6 +126,12 @@ namespace CIS580_Final
 
             Bitcoin += bps * gameTime.ElapsedGameTime.Seconds;
 
+
+            //Mouse Controls
+
+            MouseState mouseState = Mouse.GetState();
+            mousePosition.X = mouseState.X;
+            mousePosition.Y = mouseState.Y;
             base.Update(gameTime);
         }
 
@@ -120,8 +141,17 @@ namespace CIS580_Final
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.LightGray);
 
+            _spriteBatch.Begin();
+      
+
+            _spriteBatch.Draw(background, new Rectangle (0,0,1024,768), Color.White);
+            _spriteBatch.Draw(test, new Rectangle(724, 300, 300, 100), Color.White);
+
+
+
+            _spriteBatch.End();
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
