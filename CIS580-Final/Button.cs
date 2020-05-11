@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace CIS580_Final
 {
@@ -15,13 +16,21 @@ namespace CIS580_Final
 
         private int ButtonWidth; //width of the button
         private int ButtonHeight; //height of the button NOTE :Height goes downwards in monogame.
+        
 
         Game1 game;
+        Texture2D buttonTexture;
+        Rectangle size;
         
-        public Button(int SetX, int SetY, int SetWidth, int SetHeight)
+        
+        
+        public Button(int SetX, int SetY, int SetWidth, int SetHeight, Texture2D SetTexture)
         {
             SetPosition(SetX, SetY);
             SetSize(SetWidth, SetHeight);
+            buttonTexture = SetTexture;
+            size = new Rectangle(SetX, SetY, SetWidth, SetHeight);
+            
         }
 
         public void SetPosition(int x, int y)
@@ -71,10 +80,19 @@ namespace CIS580_Final
             }
             else
             {
-                return true;
+                return false;
             }
 
         }// end IsMousePosition
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+
+            spriteBatch.Draw(buttonTexture, size, Color.White);
+
+
+        }
+
 
 
     }//end class
