@@ -1,99 +1,79 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace CIS580_Final
 {
-    public class Button
+    internal class Button
     {
-        private int PositionX;//x coordinate at the top-left of the button
-        private int PositionY; //y coordinate at the top left of the button
+        /// <summary>
+        /// The button texture.
+        /// </summary>
+        private readonly Texture2D _buttonTexture;
 
-        private int ButtonWidth; //width of the button
-        private int ButtonHeight; //height of the button NOTE :Height goes downwards in monogame.
-        
+        /// <summary>
+        /// The boundaries of the button.
+        /// </summary>
+        private readonly Rectangle _size;
 
-        Game1 game;
-        Texture2D buttonTexture;
-        Rectangle size;
-        
-        
-        
-        public Button(int SetX, int SetY, int SetWidth, int SetHeight, Texture2D SetTexture)
+        /// <summary>
+        /// Constructs a new Button instance.
+        /// </summary>
+        /// <param name="x">Top-left x-coordinate</param>
+        /// <param name="y">Top-left y-coordinate</param>
+        /// <param name="width">Button width</param>
+        /// <param name="height">Button height</param>
+        /// <param name="texture">Button texture</param>
+        public Button(int x, int y, int width, int height, Texture2D texture)
         {
-            SetPosition(SetX, SetY);
-            SetSize(SetWidth, SetHeight);
-            buttonTexture = SetTexture;
-            size = new Rectangle(SetX, SetY, SetWidth, SetHeight);
-            
+            _buttonTexture = texture;
+            _size = new Rectangle(x, y, width, height);
         }
 
-        public void SetPosition(int x, int y)
-        {
-            PositionX = x;
-            PositionY = y;
-        }
-
-        public void SetSize(int width, int height)
-        {
-            ButtonWidth = width;
-            ButtonHeight = height;
-        }
-
+        /// <summary>
+        /// Checks to see if the button has been clicked.
+        /// </summary>
+        /// <param name="mouseState">The current MouseState object.</param>
+        /// <returns></returns>
         public bool IsClicked(MouseState mouseState)
         {
-            if(mouseState.LeftButton == ButtonState.Pressed && (IsMousePositionValid(mouseState) == true) )
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return mouseState.LeftButton == ButtonState.Pressed && IsMousePositionValid(mouseState);
         }
 
+        /// <summary>
+        /// Checks to see if the mouse is within the bounds of the box.
+        /// </summary>
+        /// <param name="mouseState">The current MouseState object.</param>
+        /// <returns></returns>
         private bool IsMousePositionValid(MouseState mouseState)
         {
-            int TopRightCornerXPos = PositionX + ButtonWidth; // need reference to the X coord of the top right corner of button
-            int bottomLeftCornerYPos = PositionY + ButtonHeight; //need reference to the Y coord of bottom left corner of button
+            int topRightCornerXPos = _size.X + _size.Width; // need reference to the x-coordinate of the top right corner of button
+            int bottomLeftCornerYPos = _size.Y + _size.Height; //need reference to the y-coordinate of bottom left corner of button
 
-            bool XCoordIsValid = false;
-            bool YCoordIsValid = false;
+            bool xCoordIsValid = false;
+            bool yCoordIsValid = false;
             
-            if(mouseState.Position.X > PositionX && mouseState.Position.X < TopRightCornerXPos)
+            if(mouseState.Position.X > _size.X && mouseState.Position.X < topRightCornerXPos)
             {
-                XCoordIsValid = true;
-            }
-            if (mouseState.Position.Y > PositionY && mouseState.Position.Y < bottomLeftCornerYPos)
-            {
-                YCoordIsValid = true;
+                xCoordIsValid = true;
             }
 
-            if (XCoordIsValid == true && YCoordIsValid == true)
+            if (mouseState.Position.Y > _size.Y && mouseState.Position.Y < bottomLeftCornerYPos)
             {
-                return true;
-            }
-            else
-            {
-                return false;
+                yCoordIsValid = true;
             }
 
-        }// end IsMousePosition
-
-        public void Draw(SpriteBatch spriteBatch)
-        {
-
-            spriteBatch.Draw(buttonTexture, size, Color.White);
-
+            return xCoordIsValid && yCoordIsValid;
 
         }
 
-
-
-    }//end class
-}//end namespace
+        /// <summary>
+        /// Draws the Button.
+        /// </summary>
+        /// <param name="spriteBatch">The SpriteBatch from the base game class.</param>
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(_buttonTexture, _size, Color.White);
+        }
+    }
+}
