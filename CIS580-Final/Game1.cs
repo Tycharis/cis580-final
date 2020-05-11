@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -20,6 +22,9 @@ namespace CIS580_Final
         private const double BtcPerServer = 0.00088d;
         private const double BtcPerMiner = 0.00517d;
         private const double BtcPerSupercomputer = 0.0286;
+        MouseState mouseState;
+        MouseState prevMouseState;
+        private Button button1 = new Button(100, 100, 100, 100);
 
         /// <summary>
         /// A list of all items the user has built
@@ -49,7 +54,10 @@ namespace CIS580_Final
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            _graphics.PreferredBackBufferWidth = 1024;
+            _graphics.PreferredBackBufferHeight = 768;
+            IsMouseVisible = true;
+            prevMouseState = Mouse.GetState();
             base.Initialize();
         }
 
@@ -83,7 +91,9 @@ namespace CIS580_Final
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+            mouseState = Mouse.GetState();
 
+            
             // TODO: Add your update logic here
             double bps = 0.0d;
 
@@ -110,8 +120,13 @@ namespace CIS580_Final
             });
 
             Bitcoin += bps * gameTime.ElapsedGameTime.Seconds;
-
+            
+            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && button1.IsClicked(mouseState) == true)
+            {
+                Console.WriteLine("Button clicked");
+            }
             base.Update(gameTime);
+            prevMouseState = mouseState;
         }
 
         /// <summary>
