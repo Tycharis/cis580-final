@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.Net;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -9,46 +10,50 @@ namespace CIS580_Final
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
+    public class BitcoinMiner : Game
     {
-        GraphicsDeviceManager _graphics;
-        SpriteBatch _spriteBatch;
+        readonly GraphicsDeviceManager _graphics;
+        private SpriteBatch _spriteBatch;
 
-        Vector2 mousePosition;
+        private Vector2 _mousePosition;
         
-        MouseState mouseState;
-        MouseState prevMouseState;
+        private MouseState _mouseState;
+        private MouseState _prevMouseState;
 
         //Textures
-
-        Texture2D background;
-        Texture2D test;
-        Texture2D bitCoinTexture;
+        private Texture2D _background;
+        private Texture2D _test;
+        private Texture2D _bitcoinTexture;
 
 
         //Buttons
-        Button testButton;
-        Button bitCoinButton;
+        private Button _testButton;
+        private Button _bitcoinButton;
+        private Button _exitButton;
 
         //Text
-        SpriteFont font;
-
-        
+        private SpriteFont _font;
 
         // Math constants for buildings
-        private const double BtcPerClick = 0.00011d;
-        private const double BtcPerCpu = 0.000011d;
-        private const double BtcPerGpu = 0.00011d;
-        private const double BtcPerServer = 0.00088d;
-        private const double BtcPerMiner = 0.00517d;
-        private const double BtcPerSupercomputer = 0.0286;
+        private const double BtcPerClick = 0.00012d;
+
+        private static double BtcPerCpu => 0.1 * BtcPerGpu;
+        private static double BtcPerGpu { get; set; }
+        private static double BtcPerServer => 8 * BtcPerGpu;
+        private static double BtcPerMiner => 47 * BtcPerGpu;
+        private static double BtcPerSupercomputer => 260 * BtcPerGpu;
+
+        private static double CpuCost => 15 * BtcPerGpu;
+        private static double GpuCost => 100 * BtcPerGpu;
+        private static double ServerCost => 1100 * BtcPerGpu;
+        private static double MinerCost => 12000 * BtcPerGpu;
+        private static double SupercomputerCost => 130000 * BtcPerGpu;
 
         /// <summary>
         /// A list of all items the user has built
         /// </summary>
         private List<Building> buildings = new List<Building>();
         
-
         /// <summary>
         /// The number of Bitcoin the user has collected
         /// </summary>
@@ -57,10 +62,17 @@ namespace CIS580_Final
         /// <summary>
         /// Constructs a new instance of the game
         /// </summary>
-        public Game1()
+        public BitcoinMiner()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            const string uri = "https://blockchain.info/tobtc?currency=USD&value=1";
+
+            WebClient client = new WebClient {UseDefaultCredentials = true};
+            string data = client.DownloadString(uri);
+
+            BtcPerGpu = Convert.ToDouble(data);
         }
 
         /// <summary>
@@ -71,10 +83,11 @@ namespace CIS580_Final
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
             base.Initialize();
+
+            // TODO: Add your initialization logic here
             IsMouseVisible = true;
+            Window.IsBorderless = true;
 
             //Window settings
             _graphics.PreferredBackBufferHeight = 768;
@@ -82,22 +95,18 @@ namespace CIS580_Final
             _graphics.ApplyChanges();
 
             //Sprite font
-            font = Content.Load<SpriteFont>("text");
+            _font = Content.Load<SpriteFont>("text");
 
-            mousePosition = new Vector2(_graphics.GraphicsDevice.Viewport.Width / 2, _graphics.GraphicsDevice.Viewport.Height / 2);
-            //Intialize textures
-            background = this.Content.Load<Texture2D>("GameBG");
-            test = this.Content.Load<Texture2D>("pixel");
-            bitCoinTexture = this.Content.Load<Texture2D>("Bitcoin_Coin");
+            // ReSharper disable PossibleLossOfFraction
+            _mousePosition = new Vector2(_graphics.GraphicsDevice.Viewport.Width / 2, _graphics.GraphicsDevice.Viewport.Height / 2);
+            // ReSharper restore PossibleLossOfFraction
 
             //Buttons
-            testButton = new Button(724, 300, 300, 100, test);
-            bitCoinButton = new Button(0, 200, 400, 400, bitCoinTexture);
+            _testButton = new Button(724, 300, 300, 100, _test);
+            _bitcoinButton = new Button(0, 200, 400, 400, _bitcoinTexture);
+            _exitButton = new Button(983, 6, 23, 20, null);
 
-            prevMouseState = Mouse.GetState();
-
-            
-
+            _prevMouseState = Mouse.GetState();
         }
 
         /// <summary>
@@ -110,6 +119,11 @@ namespace CIS580_Final
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+
+            // Initialize textures
+            _background = Content.Load<Texture2D>("GameBG");
+            _test = Content.Load<Texture2D>("pixel");
+            _bitcoinTexture = Content.Load<Texture2D>("Bitcoin_Coin");
         }
 
         /// <summary>
@@ -129,7 +143,7 @@ namespace CIS580_Final
         protected override void Update(GameTime gameTime)
         {
 
-            mouseState = Mouse.GetState();
+            _mouseState = Mouse.GetState();
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
@@ -139,6 +153,7 @@ namespace CIS580_Final
 
             buildings.ForEach(building =>
             {
+                // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
                 switch (building.Type)
                 {
                     case BuildingType.Cpu:
@@ -163,21 +178,29 @@ namespace CIS580_Final
 
             //Mouse Controls
 
-            mousePosition.X = mouseState.X;
-            mousePosition.Y = mouseState.Y;
+            _mousePosition.X = _mouseState.X;
+            _mousePosition.Y = _mouseState.Y;
 
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && bitCoinButton.IsClicked(mouseState) == true)
+            if (_mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released)
             {
+                if (_bitcoinButton.IsClicked(_mouseState))
+                {
+                    Bitcoin += BtcPerClick;
+                    Console.WriteLine("Bitcoin Button clicked");
+                }
+                
+                if (_testButton.IsClicked(_mouseState))
+                {
+                    Console.WriteLine("Button clicked");
+                }
 
-                Bitcoin += BtcPerClick;
-                Console.WriteLine("Bitcoin Button clicked");
+                if (_exitButton.IsClicked(_mouseState))
+                {
+                    Exit();
+                }
             }
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && testButton.IsClicked(mouseState) == true)
-            {
-                Console.WriteLine("Button clicked");
-            }
-            prevMouseState = mouseState;
 
+            _prevMouseState = _mouseState;
 
             base.Update(gameTime);
         }
@@ -190,29 +213,22 @@ namespace CIS580_Final
         {
             GraphicsDevice.Clear(Color.LightGray);
 
+            // TODO: Add your drawing code here
             _spriteBatch.Begin();
-      
+            
+            _spriteBatch.Draw(_background, new Rectangle (0,0,1024,768), Color.White);
+            _spriteBatch.Draw(_test, new Rectangle(50, 150, 300, 40), Color.Wheat);
 
-            _spriteBatch.Draw(background, new Rectangle (0,0,1024,768), Color.White);
-            _spriteBatch.Draw(test, new Rectangle(50, 150, 300, 40), Color.Wheat);
-
-
-            _spriteBatch.DrawString(font, "Score: " + Bitcoin, new Vector2(50, 150), Color.Black);
-
-
-
+            _spriteBatch.DrawString(_font, $"Score: {Bitcoin}\nUSD: ${Bitcoin * BtcPerGpu}", new Vector2(50, 150), Color.Black);
 
             //Button draws
-            testButton.Draw(_spriteBatch);
-            bitCoinButton.Draw(_spriteBatch);
-            _spriteBatch.Draw(test, new Rectangle(954, 315, 60, 30), Color.DarkRed);
-            _spriteBatch.Draw(test, new Rectangle(954, 355, 60, 30), Color.DarkRed);
+            _testButton.Draw(_spriteBatch);
+            _bitcoinButton.Draw(_spriteBatch);
 
-
-
+            _spriteBatch.Draw(_test, new Rectangle(954, 315, 60, 30), Color.DarkRed);
+            _spriteBatch.Draw(_test, new Rectangle(954, 355, 60, 30), Color.DarkRed);
 
             _spriteBatch.End();
-            // TODO: Add your drawing code here
 
             base.Draw(gameTime);
         }
