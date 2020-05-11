@@ -69,10 +69,19 @@ namespace CIS580_Final
 
             const string uri = "https://blockchain.info/tobtc?currency=USD&value=1";
 
-            WebClient client = new WebClient {UseDefaultCredentials = true};
-            string data = client.DownloadString(uri);
+            try
+            {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                WebClient client = new WebClient {UseDefaultCredentials = true};
+                string data = client.DownloadString(uri);
 
-            BtcPerGpu = Convert.ToDouble(data);
+                BtcPerGpu = Convert.ToDouble(data);
+            }
+            catch (WebException exception)
+            {
+                Console.WriteLine(exception.Message);
+                BtcPerGpu = 0.00012;
+            }
         }
 
         /// <summary>
@@ -219,7 +228,7 @@ namespace CIS580_Final
             _spriteBatch.Draw(_background, new Rectangle (0,0,1024,768), Color.White);
             _spriteBatch.Draw(_test, new Rectangle(50, 150, 300, 40), Color.Wheat);
 
-            _spriteBatch.DrawString(_font, $"Score: {Bitcoin}\nUSD: ${Bitcoin * BtcPerGpu}", new Vector2(50, 150), Color.Black);
+            _spriteBatch.DrawString(_font, $"Score: {Bitcoin:0.#####}\nUSD: ${Bitcoin * BtcPerGpu:0.#####}", new Vector2(50, 150), Color.Black);
 
             //Button draws
             _testButton.Draw(_spriteBatch);
