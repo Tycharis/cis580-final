@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -170,7 +169,6 @@ namespace CIS580_Final
                 if (_bitcoinButton.IsClicked(_mouseState))
                 {
                     _mathHandler.Click();
-                    Console.WriteLine("Bitcoin Button clicked");
                 }
 
                 //Buy buttons
@@ -178,31 +176,26 @@ namespace CIS580_Final
                 if (_cpuBuy.IsClicked(_mouseState))
                 {
                     _mathHandler.TryBuyBuilding(BuildingType.Cpu);
-                    Console.WriteLine("CPU Buy Button clicked");
                 }
 
                 if (_gpuBuy.IsClicked(_mouseState))
                 {
                     _mathHandler.TryBuyBuilding(BuildingType.Gpu);
-                    Console.WriteLine("GPU Buy Button clicked");
                 }
 
                 if (_minerBuy.IsClicked(_mouseState))
                 {
                     _mathHandler.TryBuyBuilding(BuildingType.Miner);
-                    Console.WriteLine("Miner Buy Button clicked");
                 }
 
                 if (_serverBuy.IsClicked(_mouseState))
                 {
                     _mathHandler.TryBuyBuilding(BuildingType.Server);
-                    Console.WriteLine("Server Buy Button clicked");
                 }
 
                 if (_supercomputerBuy.IsClicked(_mouseState))
                 {
                     _mathHandler.TryBuyBuilding(BuildingType.Supercomputer);
-                    Console.WriteLine("SuperComputer Buy Button clicked");
                 }
 
                 //Upgrade buttons
@@ -210,31 +203,26 @@ namespace CIS580_Final
                 if (_cpuUpgrade.IsClicked(_mouseState))
                 {
                     _mathHandler.TryBuyUpgrade(BuildingType.Cpu);
-                    Console.WriteLine("CPU Upgrade Button clicked");
                 }
 
                 if (_gpuUpgrade.IsClicked(_mouseState))
                 {
                     _mathHandler.TryBuyUpgrade(BuildingType.Gpu);
-                    Console.WriteLine("GPU Upgrade Button clicked");
                 }
 
                 if (_minerUpgrade.IsClicked(_mouseState))
                 {
                     _mathHandler.TryBuyUpgrade(BuildingType.Miner);
-                    Console.WriteLine("Miner Upgrade Button clicked");
                 }
 
                 if (_serverUpgrade.IsClicked(_mouseState))
                 {
                     _mathHandler.TryBuyUpgrade(BuildingType.Server);
-                    Console.WriteLine("Server Upgrade Button clicked");
                 }
 
                 if (_supercomputerUpgrade.IsClicked(_mouseState))
                 {
                     _mathHandler.TryBuyUpgrade(BuildingType.Supercomputer);
-                    Console.WriteLine("SuperComputer Upgrade Button clicked");
                 }
             }
 
