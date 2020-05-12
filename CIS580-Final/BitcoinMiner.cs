@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -50,42 +49,9 @@ namespace CIS580_Final
         private SpriteFont _font;
         private SpriteFont _quantities;
 
-        // Math properties for buildings
-        private static double BtcPerCpu => 0.1 * BtcPerGpu;
-        private static double BtcPerGpu { get; set; }
-        private static double BtcPerServer => 8 * BtcPerGpu;
-        private static double BtcPerMiner => 47 * BtcPerGpu;
-        private static double BtcPerSupercomputer => 260 * BtcPerGpu;
+        // Math
+        private readonly MathHandler _mathHandler;
 
-        // Numerical stuff
-        private double _bps;
-
-        // Building costs
-        private static double CpuCost => 15 * BtcPerGpu;
-        private static double GpuCost => 100 * BtcPerGpu;
-        private static double ServerCost => 1100 * BtcPerGpu;
-        private static double MinerCost => 12000 * BtcPerGpu;
-        private static double SupercomputerCost => 130000 * BtcPerGpu;
-
-        // Upgrade counters
-        private int _cpuUpgrades;
-        private int _gpuUpgrades;
-        private int _serverUpgrades;
-        private int _minerUpgrades;
-        private int _supercomputerUpgrades;
-
-        // Number of buildings
-        private int _numberOfCpus;
-        private int _numberOfGpus;
-        private int _numberOfMiners;
-        private int _numberOfServers;
-        private int _numberOfSupercomputers;
-
-        /// <summary>
-        /// The number of Bitcoin the user has collected
-        /// </summary>
-        private double Bitcoin { get; set; }
-        
         /// <summary>
         /// Constructs a new instance of the game
         /// </summary>
@@ -94,21 +60,7 @@ namespace CIS580_Final
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            const string uri = "https://blockchain.info/tobtc?currency=USD&value=1";
-
-            try
-            {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                WebClient client = new WebClient {UseDefaultCredentials = true};
-                string data = client.DownloadString(uri);
-
-                BtcPerGpu = Convert.ToDouble(data);
-            }
-            catch (WebException exception)
-            {
-                Console.WriteLine(exception.Message);
-                BtcPerGpu = 0.00012;
-            }
+            _mathHandler = new MathHandler();
         }
 
         /// <summary>
@@ -125,11 +77,13 @@ namespace CIS580_Final
             IsMouseVisible = true;
             Window.IsBorderless = true;
 
-            _bps = 0.0d;
             // Window settings
             _graphics.PreferredBackBufferHeight = 768;
             _graphics.PreferredBackBufferWidth = 1024;
             _graphics.ApplyChanges();
+
+            // Math
+            _mathHandler.Initialize();
 
             // Spritefonts
             _font = Content.Load<SpriteFont>("text");
@@ -206,17 +160,6 @@ namespace CIS580_Final
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // Bitcoin per second updates
-            double bps = 0.0d;
-
-            bps += _numberOfCpus * BtcPerCpu * (2 * _cpuUpgrades == 0 ? 1 : 2 * _cpuUpgrades);
-            bps += _numberOfGpus * BtcPerGpu * (2 * _gpuUpgrades == 0 ? 1 : 2 * _gpuUpgrades);
-            bps += _numberOfServers * BtcPerServer * (2 * _serverUpgrades == 0 ? 1 : 2 *_serverUpgrades);
-            bps += _numberOfMiners * BtcPerMiner * (2 * _minerUpgrades == 0 ? 1 : 2 * _serverUpgrades);
-            bps += _numberOfSupercomputers * BtcPerSupercomputer * (2 * _supercomputerUpgrades == 0 ? 1 : 2 * _supercomputerUpgrades);
-
-            _bps = bps;
-
             if (_mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released)
             {
                 if (_exitButton.IsClicked(_mouseState))
@@ -226,89 +169,80 @@ namespace CIS580_Final
 
                 if (_bitcoinButton.IsClicked(_mouseState))
                 {
-                    Bitcoin += BtcPerGpu;
+                    _mathHandler.Click();
                     Console.WriteLine("Bitcoin Button clicked");
                 }
 
                 //Buy buttons
 
-                if (_cpuBuy.IsClicked(_mouseState) && Bitcoin >= CpuCost *  Math.Pow(1.15,_numberOfCpus))
+                if (_cpuBuy.IsClicked(_mouseState))
                 {
-                    _numberOfCpus++;
-                    Bitcoin -= CpuCost * Math.Pow(1.15, _numberOfCpus);
+                    _mathHandler.TryBuyBuilding(BuildingType.Cpu);
                     Console.WriteLine("CPU Buy Button clicked");
                 }
 
-                if (_gpuBuy.IsClicked(_mouseState) && Bitcoin >= GpuCost * Math.Pow(1.15, _numberOfGpus))
+                if (_gpuBuy.IsClicked(_mouseState))
                 {
-                    _numberOfGpus++;
-                    Bitcoin -= (GpuCost * Math.Pow(1.15, _numberOfGpus));
+                    _mathHandler.TryBuyBuilding(BuildingType.Gpu);
                     Console.WriteLine("GPU Buy Button clicked");
                 }
 
-                if (_minerBuy.IsClicked(_mouseState) && Bitcoin >= MinerCost * Math.Pow(1.15, _numberOfMiners))
+                if (_minerBuy.IsClicked(_mouseState))
                 {
-                    _numberOfMiners++;
-                    Bitcoin -= MinerCost * Math.Pow(1.15, _numberOfMiners);
+                    _mathHandler.TryBuyBuilding(BuildingType.Miner);
                     Console.WriteLine("Miner Buy Button clicked");
                 }
 
-                if (_serverBuy.IsClicked(_mouseState) && Bitcoin >= ServerCost * Math.Pow(1.15, _numberOfServers))
+                if (_serverBuy.IsClicked(_mouseState))
                 {
-                    _numberOfServers++;
-                    Bitcoin -= ServerCost * Math.Pow(1.15, _numberOfServers);
+                    _mathHandler.TryBuyBuilding(BuildingType.Server);
                     Console.WriteLine("Server Buy Button clicked");
                 }
 
-                if (_supercomputerBuy.IsClicked(_mouseState) && Bitcoin >= SupercomputerCost * Math.Pow(1.15, _numberOfServers))
+                if (_supercomputerBuy.IsClicked(_mouseState))
                 {
-                    _numberOfSupercomputers++;
-                    Bitcoin -= SupercomputerCost * Math.Pow(1.15, _numberOfSupercomputers);
+                    _mathHandler.TryBuyBuilding(BuildingType.Supercomputer);
                     Console.WriteLine("SuperComputer Buy Button clicked");
                 }
 
                 //Upgrade buttons
 
-                if (_cpuUpgrade.IsClicked(_mouseState) && Bitcoin >= CpuCost * Math.Pow(5, _cpuUpgrades))
+                if (_cpuUpgrade.IsClicked(_mouseState))
                 {
-                    _cpuUpgrades++;
+                    _mathHandler.TryBuyUpgrade(BuildingType.Cpu);
                     Console.WriteLine("CPU Upgrade Button clicked");
                 }
 
-                if (_gpuUpgrade.IsClicked(_mouseState) && Bitcoin >= GpuCost * Math.Pow(5, _gpuUpgrades))
+                if (_gpuUpgrade.IsClicked(_mouseState))
                 {
-                    _gpuUpgrades++;
+                    _mathHandler.TryBuyUpgrade(BuildingType.Gpu);
                     Console.WriteLine("GPU Upgrade Button clicked");
                 }
 
-                if (_minerUpgrade.IsClicked(_mouseState) && Bitcoin >= MinerCost * Math.Pow(5, _minerUpgrades))
+                if (_minerUpgrade.IsClicked(_mouseState))
                 {
-                    _minerUpgrades++;
+                    _mathHandler.TryBuyUpgrade(BuildingType.Miner);
                     Console.WriteLine("Miner Upgrade Button clicked");
                 }
 
-                if (_serverUpgrade.IsClicked(_mouseState) && Bitcoin >= ServerCost * Math.Pow(5, _serverUpgrades))
+                if (_serverUpgrade.IsClicked(_mouseState))
                 {
-                    _serverUpgrades++;
+                    _mathHandler.TryBuyUpgrade(BuildingType.Server);
                     Console.WriteLine("Server Upgrade Button clicked");
                 }
 
-                if (_supercomputerUpgrade.IsClicked(_mouseState) && Bitcoin >= SupercomputerCost * Math.Pow(5, _supercomputerUpgrades))
+                if (_supercomputerUpgrade.IsClicked(_mouseState))
                 {
-                    _supercomputerUpgrades++;
+                    _mathHandler.TryBuyUpgrade(BuildingType.Supercomputer);
                     Console.WriteLine("SuperComputer Upgrade Button clicked");
                 }
             }
 
             _prevMouseState = _mouseState;
 
-            Bitcoin += bps * gameTime.ElapsedGameTime.TotalSeconds;
+            // Bitcoin per second updates
+            _mathHandler.Update(gameTime);
 
-            if (Bitcoin < 0.0d)
-            {
-                Bitcoin = 0.0d;
-            }
-            
             base.Update(gameTime);
         }
 
@@ -335,21 +269,21 @@ namespace CIS580_Final
             _spriteBatch.Draw(_minerIcon, new Rectangle(675, 560, 100, 100), Color.Wheat);
             _spriteBatch.Draw(_supercomputerIcon, new Rectangle(675, 660, 100, 100), Color.Wheat);
 
-            _spriteBatch.DrawString(_font, $"Bitcoins: {Bitcoin:0.#####}\nBPS: {_bps:0.#####}\n\nUSD: ${Bitcoin / BtcPerGpu:0.#####}", new Vector2(60, 145), Color.White);
+            _spriteBatch.DrawString(_font, $"Bitcoins: {_mathHandler.Bitcoin:0.#####}\nBPS: {_mathHandler.Bps:0.#####}\n\nUSD: ${_mathHandler.Usd:0.##}", new Vector2(60, 145), Color.White);
 
             // Building cost draws
-            _spriteBatch.DrawString(_font, $"Buy Cost: {CpuCost * Math.Pow(1.15, _numberOfCpus):0.#####}", new Vector2(783, 280), Color.White);
-            _spriteBatch.DrawString(_font, $"Buy Cost: {GpuCost * Math.Pow(1.15, _numberOfGpus):0.#####}", new Vector2(783, 380), Color.White);
-            _spriteBatch.DrawString(_font, $"Buy Cost: {ServerCost * Math.Pow(1.15, _numberOfServers):0.#####}", new Vector2(783, 480), Color.White);
-            _spriteBatch.DrawString(_font, $"Buy Cost: {MinerCost * Math.Pow(1.15, _numberOfMiners):0.#####}", new Vector2(783, 580), Color.White);
-            _spriteBatch.DrawString(_font, $"Buy Cost: {SupercomputerCost * Math.Pow(1.15, _numberOfSupercomputers):0.#####}", new Vector2(778, 680), Color.White);
+            _spriteBatch.DrawString(_font, $"Buy Cost: {_mathHandler.CpuCost:0.#####}", new Vector2(783, 280), Color.White);
+            _spriteBatch.DrawString(_font, $"Buy Cost: {_mathHandler.GpuCost:0.#####}", new Vector2(783, 380), Color.White);
+            _spriteBatch.DrawString(_font, $"Buy Cost: {_mathHandler.ServerCost:0.#####}", new Vector2(783, 480), Color.White);
+            _spriteBatch.DrawString(_font, $"Buy Cost: {_mathHandler.MinerCost:0.#####}", new Vector2(783, 580), Color.White);
+            _spriteBatch.DrawString(_font, $"Buy Cost: {_mathHandler.SupercomputerCost:0.#####}", new Vector2(778, 680), Color.White);
 
             // Upgrade cost draws
-            _spriteBatch.DrawString(_font, $"Upgrade: {CpuCost * Math.Pow(10, _cpuUpgrades):0.#####}", new Vector2(783, 320), Color.White);
-            _spriteBatch.DrawString(_font, $"Upgrade: {GpuCost * Math.Pow(10, _gpuUpgrades):0.#####}", new Vector2(783, 420), Color.White);
-            _spriteBatch.DrawString(_font, $"Upgrade: {ServerCost * Math.Pow(10, _serverUpgrades):0.#####}", new Vector2(783, 520), Color.White);
-            _spriteBatch.DrawString(_font, $"Upgrade: {MinerCost * Math.Pow(10, _minerUpgrades):0.#####}", new Vector2(783, 620), Color.White);
-            _spriteBatch.DrawString(_font, $"Upgrade: {SupercomputerCost * Math.Pow(10, _supercomputerUpgrades):0.#####}", new Vector2(783, 720), Color.White);
+            _spriteBatch.DrawString(_font, $"Upgrade: {_mathHandler.CpuUpgradeCost:0.#####}", new Vector2(783, 320), Color.White);
+            _spriteBatch.DrawString(_font, $"Upgrade: {_mathHandler.GpuUpgradeCost:0.#####}", new Vector2(783, 420), Color.White);
+            _spriteBatch.DrawString(_font, $"Upgrade: {_mathHandler.ServerUpgradeCost:0.#####}", new Vector2(783, 520), Color.White);
+            _spriteBatch.DrawString(_font, $"Upgrade: {_mathHandler.MinerUpgradeCost:0.#####}", new Vector2(783, 620), Color.White);
+            _spriteBatch.DrawString(_font, $"Upgrade: {_mathHandler.SupercomputerUpgradeCost:0.#####}", new Vector2(783, 720), Color.White);
 
             // Window title draws
             _spriteBatch.DrawString(_font, "Statistics", new Vector2(125, 110), Color.Black);
@@ -357,11 +291,11 @@ namespace CIS580_Final
             _spriteBatch.DrawString(_font, "Total Buildings", new Vector2(610, 240), Color.White);
 
             // Building quantity draws
-            _spriteBatch.DrawString(_quantities, $"{_numberOfCpus}", new Vector2(635, 295), Color.White);
-            _spriteBatch.DrawString(_quantities, $"{_numberOfGpus}", new Vector2(635, 395), Color.White);
-            _spriteBatch.DrawString(_quantities, $"{_numberOfServers}", new Vector2(635, 495), Color.White);
-            _spriteBatch.DrawString(_quantities, $"{_numberOfMiners}", new Vector2(635, 595), Color.White);
-            _spriteBatch.DrawString(_quantities, $"{_numberOfSupercomputers}", new Vector2(635, 695), Color.White);
+            _spriteBatch.DrawString(_quantities, $"{_mathHandler.NumberOfCpus}", new Vector2(635, 295), Color.White);
+            _spriteBatch.DrawString(_quantities, $"{_mathHandler.NumberOfGpus}", new Vector2(635, 395), Color.White);
+            _spriteBatch.DrawString(_quantities, $"{_mathHandler.NumberOfServers}", new Vector2(635, 495), Color.White);
+            _spriteBatch.DrawString(_quantities, $"{_mathHandler.NumberOfMiners}", new Vector2(635, 595), Color.White);
+            _spriteBatch.DrawString(_quantities, $"{_mathHandler.NumberOfSupercomputers}", new Vector2(635, 695), Color.White);
 
             // Button draws
             _bitcoinButton.Draw(_spriteBatch);
