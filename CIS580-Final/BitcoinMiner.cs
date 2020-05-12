@@ -130,27 +130,27 @@ namespace CIS580_Final
 
             //Buttons
               //testButton = new Button(724, 300, 300, 100, test);
-            bitCoinButton = new Button(0, 200, 400, 400, bitCoinTexture);
+            bitCoinButton = new Button(0, 200, 400, 400, _bitcoinTexture);
 
             //Buy buttons
-            cpuBuy = new Button(954, 275, 60, 30, test);
-            gpuBuy = new Button(954, 375, 60, 30, test);
-            minerBuy = new Button(954, 475, 60, 30, test);
-            serverBuy = new Button(954, 575, 60, 30, test);
-            superComputerBuy = new Button(954, 675, 60, 30, test);
+            cpuBuy = new Button(954, 275, 60, 30, _test);
+            gpuBuy = new Button(954, 375, 60, 30, _test);
+            minerBuy = new Button(954, 475, 60, 30, _test);
+            serverBuy = new Button(954, 575, 60, 30, _test);
+            superComputerBuy = new Button(954, 675, 60, 30, _test);
 
             //Upgrade buttons
-            cpuUpgrade = new Button(954, 315, 60, 30, test);
-            gpuUpgrade = new Button(954, 415, 60, 30, test);
-            minerUpgrade = new Button(954, 515, 60, 30, test);
-            serverUpgrade = new Button(954, 615, 60, 30, test);
-            superComputerUpgrade = new Button(954, 715, 60, 30, test);
+            cpuUpgrade = new Button(954, 315, 60, 30, _test);
+            gpuUpgrade = new Button(954, 415, 60, 30, _test);
+            minerUpgrade = new Button(954, 515, 60, 30, _test);
+            serverUpgrade = new Button(954, 615, 60, 30, _test);
+            superComputerUpgrade = new Button(954, 715, 60, 30, _test);
 
 
 
 
 
-            prevMouseState = Mouse.GetState();
+            _prevMouseState = Mouse.GetState();
 
             
             _testButton = new Button(724, 300, 300, 100, _test);
@@ -230,7 +230,7 @@ namespace CIS580_Final
             _mousePosition.X = _mouseState.X;
             _mousePosition.Y = _mouseState.Y;
 
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && bitCoinButton.IsClicked(mouseState) == true)
+            if (_mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released && bitCoinButton.IsClicked(_mouseState) == true)
             {
 
                 Bitcoin += BtcPerClick;
@@ -244,30 +244,30 @@ namespace CIS580_Final
 
             
             //Buy button
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && cpuBuy.IsClicked(mouseState) == true)
+            if (_mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released && cpuBuy.IsClicked(_mouseState) == true)
             {
                 buildings.Add(new Building { Type = BuildingType.Cpu });
                 Console.WriteLine("CPU Buy Button clicked");
             }
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && gpuBuy.IsClicked(mouseState) == true)
+            if (_mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released && gpuBuy.IsClicked(_mouseState) == true)
             {
                 buildings.Add(new Building { Type = BuildingType.Gpu });
 
                 Console.WriteLine("GPU Buy Button clicked");
             }
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && minerBuy.IsClicked(mouseState) == true)
+            if (_mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released && minerBuy.IsClicked(_mouseState) == true)
             {
                 buildings.Add(new Building { Type = BuildingType.Miner });
 
                 Console.WriteLine("Miner Buy Button clicked");
             }
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && serverBuy.IsClicked(mouseState) == true)
+            if (_mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released && serverBuy.IsClicked(_mouseState) == true)
             {
                 buildings.Add(new Building { Type = BuildingType.Server });
 
                 Console.WriteLine("Server Buy Button clicked");
             }
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && superComputerBuy.IsClicked(mouseState) == true)
+            if (_mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released && superComputerBuy.IsClicked(_mouseState) == true)
             {
                 buildings.Add(new Building { Type = BuildingType.Supercomputer });
 
@@ -275,28 +275,29 @@ namespace CIS580_Final
             }
 
             //Upgrade button
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && cpuUpgrade.IsClicked(mouseState) == true)
+            if (_mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released && cpuUpgrade.IsClicked(_mouseState) == true)
             {
                 Console.WriteLine("CPU Upgarde Button clicked");
             }
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && gpuUpgrade.IsClicked(mouseState) == true)
+            if (_mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released && gpuUpgrade.IsClicked(_mouseState) == true)
             {
                 Console.WriteLine("GPU Upgrade Button clicked");
             }
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && minerUpgrade.IsClicked(mouseState) == true)
+            if (_mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released && minerUpgrade.IsClicked(_mouseState) == true)
             {
                 Console.WriteLine("Miner Upgrade Button clicked");
             }
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && serverUpgrade.IsClicked(mouseState) == true)
+            if (_mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released && serverUpgrade.IsClicked(_mouseState) == true)
             {
                 Console.WriteLine("Server Upgrade Button clicked");
             }
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && superComputerUpgrade.IsClicked(mouseState) == true)
+            if (_mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released && superComputerUpgrade.IsClicked(_mouseState) == true)
             {
                
                 Console.WriteLine("SuperComputer Upgrade Button clicked");
             }
-            prevMouseState = mouseState;
+
+            _prevMouseState = _mouseState;
 
             _prevMouseState = _mouseState;
 
@@ -317,9 +318,9 @@ namespace CIS580_Final
             _spriteBatch.Begin();
       
             //Display draws
-            _spriteBatch.Draw(background, new Rectangle (0,0,1024,768), Color.White);
-            _spriteBatch.Draw(test, new Rectangle(50, 150, 300, 40), Color.Wheat);
-            _spriteBatch.DrawString(font, "Score: " + Bitcoin, new Vector2(50, 150), Color.Black);
+            _spriteBatch.Draw(_background, new Rectangle (0,0,1024,768), Color.White);
+            _spriteBatch.Draw(_test, new Rectangle(50, 150, 300, 40), Color.Wheat);
+            _spriteBatch.DrawString(_font, "Score: " + Bitcoin, new Vector2(50, 150), Color.Black);
 
 
 
