@@ -73,6 +73,25 @@
 /processorParam:TextureFormat=Color
 /build:GPU_Icon.png
 
+#begin Miner_Icon.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Miner_Icon.png
+
+#begin numberSize.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:numberSize.spritefont
+
 #begin pixel.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -128,6 +147,18 @@
 /processorParam:TextureFormat=Color
 /build:Text_Background.png
 
+#begin Text_Window.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Text_Window.png
+
 #begin Upgrade_Button.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -139,4 +170,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Upgrade_Button.png
+
+#begin Upgrade_Window.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Upgrade_Window.png
 
